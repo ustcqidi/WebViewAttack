@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        mWebView = (WebViewEx) findViewById(R.id.webview);
+//        mWebView = (SafeWebView) findViewById(R.id.webview);
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.addJavascriptInterface(new JSInterface(), "jsInterface");

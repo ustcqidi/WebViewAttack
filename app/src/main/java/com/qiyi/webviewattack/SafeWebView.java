@@ -21,18 +21,14 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class WebViewEx extends WebView {
+public class SafeWebView extends WebView {
     
     private static final boolean DEBUG = true;
     private static final String VAR_ARG_PREFIX = "arg";
-    private static final String MSG_PROMPT_HEADER = "MyApp:";
-    /** 对象名 */
+    private static final String MSG_PROMPT_HEADER = "Qiyi:";
     private static final String KEY_INTERFACE_NAME = "obj";
-    /** 函数名 */
     private static final String KEY_FUNCTION_NAME = "func";
-    /** 参数数组 */
     private static final String KEY_ARG_ARRAY = "args";
-    /** 要过滤的方法数组 */
     private static final String[] mFilterMethods = {
         "getClass",
         "hashCode",
@@ -42,36 +38,27 @@ public class WebViewEx extends WebView {
         "toString",
         "wait",
     };
-    
-    /**
-     * 缓存addJavascriptInterface的注册对象
-     */
+
     private HashMap<String, Object> mJsInterfaceMap = new HashMap<String, Object>();
     
-    /**
-     * 缓存注入到JavaScript Context的js脚本
-     */
+
     private String mJsStringCache = null;
     
-    public WebViewEx(Context context, AttributeSet attrs, int defStyle) {
+    public SafeWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
 
-    public WebViewEx(Context context, AttributeSet attrs) {
+    public SafeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public WebViewEx(Context context) {
+    public SafeWebView(Context context) {
         super(context);
         init(context);
     }
-    
-    /**
-     * webview初始化，设置监听，删除部分Android默认注册的JS接口 
-     * @param context
-     */
+
     private void init(Context context) {
         // 添加默认的Client
         super.setWebChromeClient(new WebChromeClientEx());
@@ -141,12 +128,9 @@ public class WebViewEx extends WebView {
         Log.e("WebViewAttack", "mJsStringCache = " + mJsStringCache);
         loadJavascriptInterfaces();
     }
-    
-    /**
-     * 如果webView是WebViewEx类型，则向JavaScript Context注入对象（确保webview是有安全机制的）
-     */
+
     private void injectJavascriptInterfaces(WebView webView) {
-        if (webView instanceof WebViewEx) {
+        if (webView instanceof SafeWebView) {
             injectJavascriptInterfaces();
         }
     }
@@ -168,19 +152,19 @@ public class WebViewEx extends WebView {
             mJsStringCache = null;
             return null;
         }
-        
+
         /*
          * 要注入的JS的格式，其中XXX为注入的对象的方法名，例如注入的对象中有一个方法A，那么这个XXX就是A
          * 如果这个对象中有多个方法，则会注册多个window.XXX_js_interface_name块，我们是用反射的方法遍历
          * 注入对象中的所有带有@JavaScripterInterface标注的方法
-         * 
+         *
          * javascript:(function JsAddJavascriptInterface_(){
          *   if(typeof(window.XXX_js_interface_name)!='undefined'){
          *       console.log('window.XXX_js_interface_name is exist!!');
          *   }else{
          *       window.XXX_js_interface_name={
          *           XXX:function(arg0,arg1){
-         *               return prompt('MyApp:'+JSON.stringify({obj:'XXX_js_interface_name',func:'XXX_',args:[arg0,arg1]}));
+         *               return prompt('Qiyi:'+JSON.stringify({obj:'XXX_js_interface_name',func:'XXX_',args:[arg0,arg1]}));
          *           },
          *       };
          *   }
@@ -450,7 +434,7 @@ public class WebViewEx extends WebView {
         
         @Override
         public final boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) { 
-            if (view instanceof WebViewEx) {
+            if (view instanceof SafeWebView) {
                 if (handleJsInterface(view, url, message, defaultValue, result)) {
                     return true;
                 }

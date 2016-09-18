@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Invalid url = http://bitkiller.duapp.com/jsobj.html"/>
 
-    <!--<com.qiyi.webviewattack.WebViewEx-->
+    <!--<com.qiyi.webviewattack.SafeWebView-->
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
